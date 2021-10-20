@@ -34,27 +34,27 @@ int Nverify(const uint8_t *salt, const uint8_t *message, const size_t mlen,
 				- ((f3_vector_coeff_f(t_0, t_1, 2 * i + 1)))) + 3) % 3;
 
 		if (c_i == 1) {
-			f3_vector_sum_inplace_avx_f(hash_r0, hash_r1, pk->row[2 * i].r0,
+			f3_vector_sum_inplace_f(hash_r0, hash_r1, pk->row[2 * i].r0,
 					pk->row[2 * i].r1, alloc);
 		} else if (c_i == 2) {
-			f3_vector_sub_inplace_avx_f(hash_r0, hash_r1, pk->row[2 * i].r0,
+			f3_vector_sub_inplace_f(hash_r0, hash_r1, pk->row[2 * i].r0,
 					pk->row[2 * i].r1, alloc);
 		}
 		if (c_ip == 1) {
-			f3_vector_sum_inplace_avx_f(hash_r0, hash_r1, pk->row[2 * i + 1].r0,
+			f3_vector_sum_inplace_f(hash_r0, hash_r1, pk->row[2 * i + 1].r0,
 					pk->row[2 * i + 1].r1, alloc);
 		} else if (c_ip == 2) {
-			f3_vector_sub_inplace_avx_f(hash_r0, hash_r1, pk->row[2 * i + 1].r0,
+			f3_vector_sub_inplace_f(hash_r0, hash_r1, pk->row[2 * i + 1].r0,
 					pk->row[2 * i + 1].r1, alloc);
 		}
 
 	}
 
 	if (f3_vector_coeff_f(t_0, t_1, K - 1) == 1) {
-		f3_vector_sum_inplace_avx_f(hash_r0, hash_r1, pk->row[K - 1].r0,
+		f3_vector_sum_inplace_f(hash_r0, hash_r1, pk->row[K - 1].r0,
 				pk->row[K - 1].r1, alloc);
 	} else if (f3_vector_coeff_f(t_0, t_1, K - 1) == 2) {
-		f3_vector_sub_inplace_avx_f(hash_r0, hash_r1, pk->row[K - 1].r0,
+		f3_vector_sub_inplace_f(hash_r0, hash_r1, pk->row[K - 1].r0,
 				pk->row[K - 1].r1, alloc);
 	}
 
