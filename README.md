@@ -12,7 +12,8 @@
   ```
 ### Optimized version ### 
 Optimized version uses AVX2 for computing the low level arithmetic. 
-to run the low the optimized version :
+
+To run the low the optimized version :
 ```
   git clone git@github.com:waveletc/wavelet.git
   cd opt 
