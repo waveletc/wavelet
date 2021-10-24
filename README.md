@@ -4,7 +4,9 @@
 
 ### How to Run ### 
 
-``git clone git@github.com:waveletc/wavelet.git
+```
+  git clone git@github.com:waveletc/wavelet.git
   cd ref 
   make 
-  ./wave ''
+  ./wave
+  ```
