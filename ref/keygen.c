@@ -2,6 +2,16 @@
 #include <stdio.h>
 #include "keygen.h"
 
+/**
+ * Function:  gen_coeffUV
+ * --------------------
+ *  Generation of coefficients a, b,c,d,x.
+ *  a and c cannot contains 0.
+ *
+ *  PRNG: Pseudorandom generator (trits)
+ * 	coeff: structure that will contains the trits
+ *
+ */
 void gen_coeffUV(prng_t *PRNG, coeff_t *coeff) {
 	int i;
 
@@ -17,6 +27,20 @@ void gen_coeffUV(prng_t *PRNG, coeff_t *coeff) {
 	}
 
 }
+
+/**
+ * Function:  full_parity_check_matrix
+ * --------------------
+ * cComputation of the parity check matrix.
+ *
+ *  HU: Matrix in the U space (N2-KU x N2)
+ *  HV: Matrix in V space (N2-KV x N2)
+ *  coeff: coefficients pseudorandom generated.
+ *
+ *
+ * return:
+ * Matrix H size N-K x N
+ */
 
 mf3* full_parity_check_matrix(mf3 *HU, mf3 *HV, coeff_t *coeff) {
 	int i, j;

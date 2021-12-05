@@ -5,16 +5,12 @@
 #include <string.h>
 
 #include "fips202.h"
-
 #include "vf3.h"
 
 #include "prng.h"
 #include "randombytes.h"
-
 #include "definitions.h"
-
 #include "commons.h"
-
 #include "wave.h"
 #include "params.h"
 
