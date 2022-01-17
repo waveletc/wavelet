@@ -1,3 +1,9 @@
+/*
+ * prng.h
+ *
+ *  Created on: Jan 30, 2021
+ *      Author: vader
+ */
 
 #ifndef PRNG_H_
 #define PRNG_H_

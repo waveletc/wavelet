@@ -1,3 +1,10 @@
+/*
+ * commons.c
+ *
+ *  Created on: Apr 11, 2021
+ *      Author: Gustavo Banegas
+ */
+
 #include "commons.h"
 
 /* GLOBAL VARIABLES: precomputed data */
@@ -7,21 +14,6 @@ Cdist_t CLPV, *CLPU;
 /* GLOBAL VARIABLES: statistics, others, ... */
 unsigned long rejU, rejV;
 
-
-/*
- * Function:  cmp
- * --------------------
- *  Computes the value random value satisfies the distribution
- *
- *  r: random stream
- *
- *  x: Distribution value
- *
- *  i: ith position in the distribution
- *
- *  returns: 1 if the value satisfies
- *  		-1 if the value does not satisfy.
- */
 int cmp(random_stream_t *r, fp_t x, int i) {
 	if (i - x.offset >= DISTRIB_PREC)
 		return 0;
@@ -38,18 +30,6 @@ int cmp(random_stream_t *r, fp_t x, int i) {
 		return 1;
 }
 
-/*
- * Function:  pickV
- * --------------------
- *  Pick a value from code V
- *
- *  PRNG: Pseudo-random generator
- *
- *
- *
- *  returns: max value in V
- */
-
 int pickV(prng_t *PRNG) {
 	int i_min = -1;
 	int i_max = CLPV.size - 1;
@@ -65,18 +45,6 @@ int pickV(prng_t *PRNG) {
 	}
 	return CLPV.value[i_max];
 }
-
-/*
- * Function:  acceptV
- * --------------------
- *  Pick a value from code V
- *
- *  PRNG: Pseudo-random generator
- *
- *
- *
- *  returns: max value in V
- */
 
 int acceptV(int t, prng_t *PRNG) {
 	if ((t < rV.min) || (t > rV.max))

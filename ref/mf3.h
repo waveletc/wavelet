@@ -1,9 +1,17 @@
+/*
+ * mf3.h
+ *
+ *  Created on: Jun 21, 2021
+ *       Author: Gustavo Banegas
+ */
+
 #ifndef MF3_H_
 #define MF3_H_
 
 #include "definitions.h"
 
 #include "vf3.h"
+#include "f3.h"
 
 #include "prng.h"
 
@@ -31,7 +39,11 @@ mf3* mf3_copy(mf3 *M);
 
 mf3* mf3_augment(mf3 *H, uint8_t *s);
 
+void mf3_mul_mf3_T(const mf3 *M, const mf3 *a, mf3 *res);
+
 void mf3_ma_mul(const mf3 *M, const uint8_t *a, uint8_t *res);
+
+void mf3_ma_mul_slow(const mf3 *M, const uint8_t *a, uint8_t *res);
 
 void mf3_mv_mul_v(const mf3 *M, const f3_vector *v, f3_vector *a);
 

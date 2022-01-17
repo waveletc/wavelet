@@ -26,7 +26,7 @@ typedef struct {
 
 // Context for incremental API
 typedef struct {
-    uint64_t ctx[26];
+    uint64_t* ctx;
 } shake256incctx;
 
 // Context for non-incremental API

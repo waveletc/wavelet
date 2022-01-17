@@ -1,8 +1,7 @@
 #include "prng.h"
 
 void fill(prng_t *PRNG) {
-	//sha3_512(PRNG->buff, PRNG->buff, HASH_SIZE);
-	shake256_inc_squeeze(PRNG->buff, 64, &PRNG->sha3);
+	sha3_512(PRNG->buff, PRNG->buff, HASH_SIZE);
 	PRNG->available = 64;
 }
 
@@ -97,36 +96,26 @@ prng_t* prng_init(unsigned long seed) {
 	//PRNG->init_str = malloc(strlen(type) + 4 + 20 + 1);
 	memcpy(PRNG->init_str, PARAMS_ID, sizeof(uint8_t) * PARAMS_ID_SIZE);
 	memcpy(PRNG->init_str + PARAMS_ID_SIZE, &seed, sizeof(unsigned long) * 1);
-	shake256incctx sha3;
+	//sprintf(PRNG->init_str, "%s%lu", PARAMS_ID, seed);
 
-	shake256_inc_init(&sha3);
-
-	shake256_inc_absorb(&sha3, PRNG->init_str, 25);
-	shake256_inc_squeeze(PRNG->buff, 64, &sha3);
-	PRNG->sha3 = sha3;
-	shake256_inc_squeeze(PRNG->buff, 128, &PRNG->sha3);
-
-	//PRNG->sha3 = &sha3;
+	sha3_512(PRNG->buff, PRNG->init_str, 25);
 	PRNG->available = HASH_SIZE;
 	PRNG->available2 = 0;
 	PRNG->available3 = 0;
 	PRNG->bytecount = 0;
-	PRNG->buff3 = PRNG->buff[0];
-	PRNG->buff2 = PRNG->buff[1];
+	PRNG->buff3 = 0;
 	return PRNG;
 }
 
 void prng_clear(prng_t *PRNG) {
 	//free(PRNG->init_str);
-	//shake256_inc_ctx_release(PRNG->sha3);
-	//free(PRNG->sha3->ctx);
 	free(PRNG);
 }
 
 int* identity_perm(int n) {
 	int *a = (int*) malloc(n * sizeof(int));
 	for (int i = 0; i < n; i++)
-	a[i] = i;
+		a[i] = i;
 	return a;
 }
 
@@ -151,3 +140,4 @@ void rand_shuffle(unsigned int *a, int n, int t, prng_t *PRNG) {
 		a[i] = c;
 	}
 }
+

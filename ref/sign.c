@@ -1,13 +1,14 @@
 #include "sign.h"
+#include "api.h"
 
-void phiUV_sign(uint8_t *e, uint8_t *eU, uint8_t *eV, wave_sk_t *sk) {
+void phiUV(uint8_t *e, uint8_t *eU, uint8_t *eV, wave_sk_t sk) {
 	int i;
-	int length = sk->HU->n_cols;
+	int length = sk.HU->n_cols;
 	for (i = 0; i < length; i++) {
-		e[i] = f3_add(f3_mul(sk->coeff.a[i], eU[i]),
-				f3_mul(sk->coeff.b[i], eV[i]));
-		e[i + length] = f3_add(f3_mul(sk->coeff.c[i], eU[i]),
-				f3_mul(sk->coeff.d[i], eV[i]));
+		e[i] = f3_add(f3_mul(sk.coeff.a[i], eU[i]),
+				f3_mul(sk.coeff.b[i], eV[i]));
+		e[i + length] = f3_add(f3_mul(sk.coeff.c[i], eU[i]),
+				f3_mul(sk.coeff.d[i], eV[i]));
 	}
 }
 
@@ -45,29 +46,32 @@ void supp(uint8_t *v, int length, int *weight, unsigned int *support) {
 void decodeV(uint8_t *eV, uint8_t *sV, mf3 *HV, prng_t *PRNG) {
 	int i, t;
 	uint8_t y[N - K] = { 0 };
-	unsigned int support[N2] = { 0 };
-	for (int i = 0; i < N2; ++i)
-		support[i] = i;
-	mf3 *H = mf3_augment(HV, sV);
-	//save_matrix(H);
-	//uint8_t eV[N2+1];
-	//uint8_t *eV = (uint8_t*) malloc((N2 + 1) * sizeof(uint8_t));
+
 	eV[N2] = f3_neg(1); // -1
+
+	mf3 *H = mf3_augment(HV, sV);
 	do {
-		rand_shuffle(support, N2, N2 - KV + D, PRNG);
-	} while (mf3_gauss_elim(H, support) > N2 - KV + D);
-	//save_matrix(H);
-	/*
-	 mf3_gauss_elim() returns the number of pivots that were tried
-	 before the Guassian elimination ended.
+		unsigned int support[N2] = { 0 }; //identity_perm(N2);
+		for (int i = 0; i < N2; ++i)
+			support[i] = i;
+		//save_matrix(H);
+		//uint8_t eV[N2+1];
+		//uint8_t *eV = (uint8_t*) malloc((N2 + 1) * sizeof(uint8_t));
 
-	 If d is large enough (the fully proven variant of Wave) the
-	 above condition succeeds with probability overwhelmingly close to 1.
+		do {
+			rand_shuffle(support, N2, N2 - KV + D, PRNG);
+		} while (mf3_gauss_elim(H, support) > N2 - KV + D);
+		//save_matrix(H);
+		/*
+		 mf3_gauss_elim() returns the number of pivots that were tried
+		 before the Guassian elimination ended.
 
-	 If d = 0 (the 'no gap' variant) we repeat the Gaussian
-	 elimination until no pivot fails.
-	 */
-	while (1) {
+		 If d is large enough (the fully proven variant of Wave) the
+		 above condition succeeds with probability overwhelmingly close to 1.
+
+		 If d = 0 (the 'no gap' variant) we repeat the Gaussian
+		 elimination until no pivot fails.
+		 */
 		t = pickV(PRNG);
 		for (i = 0; i < N2 - KV; ++i)
 			eV[support[i]] = 0;
@@ -77,37 +81,39 @@ void decodeV(uint8_t *eV, uint8_t *sV, mf3 *HV, prng_t *PRNG) {
 			eV[support[i]] = 0;
 		for (; i < N2; ++i)
 			eV[support[i]] = f3_randnonzero(PRNG);
-		mf3_ma_mul(H, eV, y);
+		mf3_ma_mul_slow(H, eV, y);
 		for (i = 0; i < N2 - KV; ++i)
 			eV[support[i]] = f3_neg(y[i]);
 		//free(y);
-		if (acceptV(f3_array_weight(eV, N2), PRNG))
-			break;
-		rejV++; //updating the rejection
-	}
+		/*	if ()
+		 break;*/
+		rejV++;
+
+	} while (!acceptV(f3_array_weight(eV, N2), PRNG));
 	//free(support);
 	mf3_free(H);
 	//return eV;
 }
 
-void decodeU(uint8_t *e, uint8_t *sU, uint8_t *eV, mf3 *HU, wave_sk_t *sk,
+void decodeU(uint8_t *e, uint8_t *sU, uint8_t *eV, mf3 *HU, wave_sk_t sk,
 		prng_t *PRNG) {
 	int i, t, k_nz;
-	uint8_t y[N - K];
-	unsigned int suppV[N2] = { 0 };
-	supp(eV, N2, &t, suppV);
-	unsigned int support[N2] = { 0 }; //(int *) malloc(N2 * sizeof(int));
-	uint8_t eU[N2 + 1] = { 0 }; // (int8_t *) malloc((N2 + 1) * sizeof(int8_t));
-	/*
-	 supp(eV, n2, &t) returns an array of all coordinates
-	 {0, 1 ... n2-1} starting with the non zero positions of eV.
-	 Side effect: the value of t is set to the weight of eV.
-	 */
-
 	mf3 *H = mf3_augment(HU, sU);
 
-	eU[N2] = f3_neg(1); // -1
-	while (1) {
+	do {
+		uint8_t y[N - K] = { 0 };
+		unsigned int suppV[N2] = { 0 };
+		supp(eV, N2, &t, suppV);
+		unsigned int support[N2] = { 0 }; //(int *) malloc(N2 * sizeof(int));
+		uint8_t eU[N2 + 1] = { 0 }; // (int8_t *) malloc((N2 + 1) * sizeof(int8_t));
+		/*
+		 supp(eV, n2, &t) returns an array of all coordinates
+		 {0, 1 ... n2-1} starting with the non zero positions of eV.
+		 Side effect: the value of t is set to the weight of eV.
+		 */
+
+		eU[N2] = f3_neg(1); // -1
+
 		k_nz = pickU(t, PRNG);
 		do {
 			rand_shuffle(suppV, t, t - k_nz, PRNG);
@@ -146,40 +152,38 @@ void decodeU(uint8_t *e, uint8_t *sU, uint8_t *eV, mf3 *HU, wave_sk_t *sk,
 				if (eV[support[i]] == 0)
 					eU[support[i]] = f3_randnonzero(PRNG);
 				else
-					eU[support[i]] = f3_mul(sk->coeff.x[support[i]],
+					eU[support[i]] = f3_mul(sk.coeff.x[support[i]],
 							eV[support[i]]);
-			mf3_ma_mul(H, eU, y);
+			mf3_ma_mul_slow(H, eU, y);
 			for (i = 0; i < N2 - KU; ++i)
 				eU[support[i]] = f3_neg(y[i]);
 			//free(y);
-			phiUV_sign(e, eU, eV, sk);
+			phiUV(e, eU, eV, sk);
 		} while (f3_array_weight(e, N) != W);
-		if (acceptU(t, nz_pairs(e, N2), PRNG))
-			break;
+
 		rejU++;
-	}
+	} while (acceptU(t, nz_pairs(e, N2), PRNG));
 
 	mf3_free(H);
 }
 
-
 //TODO fix eprime
-void sign_wave(f3_vector *e, f3_vector *s, wave_sk_t *sk, prng_t *PRNG) {
+void sign_wave(f3_vector *e, f3_vector *s, wave_sk_t sk, prng_t *PRNG) {
 	uint8_t eV[N2 + 1] = { 0 };
 	uint8_t eprime[N2 * 2] = { 0 };
 	uint8_t sprime[N - K] = { 0 };
-	mf3_mv_mul(sk->Sinv, s, sprime);
-	decodeV(eV, sprime + (N2 - KU), sk->HV, PRNG);
-	decodeU(eprime, sprime, eV, sk->HU, sk, PRNG);
+	mf3_mv_mul(sk.Sinv, s, sprime);
+	decodeV(eV, sprime + (N2 - KU), sk.HV, PRNG);
+	decodeU(eprime, sprime, eV, sk.HU, sk, PRNG);
 
 	for (int i = 0; i < N; ++i) {
-		f3_vector_setcoeff(e, i, eprime[sk->perm[i]]);
+		f3_vector_setcoeff(e, i, eprime[sk.perm[i]]);
 	}
 
 }
 
-void sign(f3_vector *signature, f3_vector *message_hash, uint8_t *salt, const uint8_t *message,
-		const size_t mlen, wave_sk_t *sk) {
+void sign(f3_vector *signature, f3_vector *message_hash, uint8_t *salt,
+		const uint8_t *message, const size_t mlen, const wave_sk_t sk) {
 
 	randombytes(salt, SALT_SIZE);
 	uint8_t seed;

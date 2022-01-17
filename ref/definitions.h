@@ -1,13 +1,35 @@
+/*
+ * definitions.h
+ *
+ *  Created on: Jun 21, 2021
+ *      Author: Gustavo Banegas
+ */
+
 #ifndef DEFINITIONS_H_
 #define DEFINITIONS_H_
 
 #include <stdio.h>
 #include <stdint.h>
-#include "fips202.h"
 
 #include "params.h"
+/*
+ * (0,0) -> 0
+ * (0,1) -> 1
+ * (1,0) -> 2
+ */
+#define SIXOP 1
+
+/*
+ * (0,0) -> 0
+ * (0,1) -> 1
+ * (1,1) -> 2
+ */
+
+#define SEVENOP 0
+
 
 typedef uint64_t wave_word;
+
 
 #define WORD_LENGTH (8*sizeof(wave_word))
 #define HASH_SIZE 64
@@ -29,7 +51,7 @@ typedef struct {
 } mf3;
 
 typedef struct prng {
-	uint8_t buff[256];
+	uint8_t buff[HASH_SIZE];
 	uint8_t buff2;
 	uint8_t buff3;
 	uint8_t available;
@@ -37,7 +59,6 @@ typedef struct prng {
 	uint8_t available3;
 	unsigned long bytecount;
 	uint8_t init_str[25];
-	shake256incctx sha3;
 } prng_t;
 
 typedef struct {

@@ -1,3 +1,10 @@
+/*
+ * mf3.c
+ *
+ *  Created on: Jun 21, 2021
+ *      Author: Gustavo Banegas
+ */
+
 #include "mf3.h"
 #include <time.h>
 
@@ -71,10 +78,9 @@ int mf3_gauss_elim_single(mf3 *M, size_t r, size_t j) {
 		if (a != 0) {
 			if (a == 2) { // normalize row
 				// exchanging r0 and r1 multiplies the row by -1
-				f3_vector_neg(&M->row[i]);
-				/*wave_word *temp = M->row[i].r0;
-				 M->row[i].r0 = M->row[i].r1;
-				 M->row[i].r1 = temp;*/
+				wave_word *temp = M->row[i].r0;
+				M->row[i].r0 = M->row[i].r1;
+				M->row[i].r1 = temp;
 
 			}
 
@@ -142,13 +148,10 @@ mf3* mf3_augment(mf3 *H, uint8_t *s) {
 	wave_word z = ((wave_word) 1) << (H->n_cols % WORD_LENGTH);
 	for (size_t l = 0; l < H->n_rows; ++l) {
 		element_copy(&Hp->row[l], &H->row[l]);
-		if (s[l] == 1){
+		if (s[l] == 1)
 			Hp->row[l].r0[i] ^= z;
-		}
-		else if (s[l] == 2){
+		else if (s[l] == 2)
 			Hp->row[l].r1[i] ^= z;
-			Hp->row[l].r0[i] ^= z;
-		}
 	}
 	// pretend that the last column isn't there
 	Hp->n_cols = H->n_cols; // instead of H.coldim + 1
@@ -175,6 +178,13 @@ mf3* mf3_copy(mf3 *M) {
 	return H;
 }
 
+void mf3_mv_mul_slow(const mf3 *M, const f3_vector *v, uint8_t *a) {
+	size_t i;
+	for (i = 0; i < M->n_rows; i++) {
+		a[i] = f3_vector_dotproduct_slow(&M->row[i], v);
+	}
+}
+
 void mf3_mv_mul_v(const mf3 *M, const f3_vector *v, f3_vector *a) {
 	size_t i;
 
@@ -190,6 +200,12 @@ void mf3_mv_mul(const mf3 *M, const f3_vector *v, uint8_t *a) {
 	for (i = 0; i < M->n_rows; i++) {
 		a[i] = f3_vector_dotproduct(&M->row[i], v);
 	}
+}
+void mf3_ma_mul_slow(const mf3 *M, const uint8_t *a, uint8_t *res) {
+	f3_vector v = f3_vector_new(M->row[0].size);
+	f3_vector_set_from_array(&v, a, M->row[0].size);
+	mf3_mv_mul_slow(M, &v, res);
+	f3_vector_free(&v);
 }
 
 void mf3_ma_mul(const mf3 *M, const uint8_t *a, uint8_t *res) {
@@ -210,4 +226,48 @@ void mf3_print(mf3 *M) {
 	printf("\n");
 }
 
+void mf3_mul_mf3_T(const mf3 *mtx1, const mf3 *mtx2, mf3 *res) {
+
+	for (int i = 0; i < mtx1->n_rows; i++) {
+		int index = 0;
+		for (int j = 0; j < mtx2->n_rows; j++) {
+			uint8_t result = f3_vector_dotproduct(&mtx1->row[i], &mtx2->row[j]);
+			mf3_setcoeff(res, i, index, result);
+			index++;
+		}
+	}
+	/*int row, col, k;
+	 for (col = 0; col < mtx2->n_cols; col++) {
+	 for (row = 0; row < mtx1->n_rows; row++) {
+	 uint8_t value = 0;
+	 for (k = 0; k < mtx1->n_cols; k++) {
+	 value += (mf3_coeff(mtx1, row, k) * mf3_coeff(mtx2, k, col))
+	 % 3;
+	 value = value % 3;
+	 }
+	 mf3_setcoeff(res, row, col, value);
+
+	 }
+	 }*/
+
+}
+/*
+ int product(matrix *mtx1, matrix *mtx2, matrix *prod) {
+ if (!mtx1 || !mtx2 || !prod)
+ return -1;
+ if (mtx1->cols != mtx2->rows || mtx1->rows != prod->rows
+ || mtx2->cols != prod->cols)
+ return -2;
+
+ int row, col, k;
+ for (col = 1; col <= mtx2->cols; col++)
+ for (row = 1; row <= mtx1->rows; row++) {
+ double val = 0.0;
+ for (k = 1; k <= mtx1->cols; k++)
+ val += ELEM(mtx1, row, k) * ELEM(mtx2, k, col);
+ ELEM(prod, row, col) = val;
+ }
+ return 0;
+ }
+ */
 

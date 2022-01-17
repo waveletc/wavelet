@@ -1,3 +1,9 @@
+/*
+ * sign.h
+ *
+ *  Created on: Apr 11, 2021
+ *      Author: Gustavo Banegas
+ */
 
 #ifndef SRC_WAVE_SIGN_H_
 #define SRC_WAVE_SIGN_H_
@@ -36,13 +42,13 @@ void supp(uint8_t *v, int length, int *weight, unsigned int *suppV);
 void decodeV(uint8_t *eV, uint8_t *sV, mf3 *HV, prng_t *PRNG);
 //int8_t* decodeV(int8_t *sV, mf3_t HV, prng_t PRNG);
 
-void decodeU(uint8_t *e, uint8_t *sU, uint8_t *eV, mf3 *HU, wave_sk_t *sk,
+void decodeU(uint8_t *e, uint8_t *sU, uint8_t *eV, mf3 *HU, wave_sk_t sk,
 		prng_t *PRNG);
 //int8_t* decodeU(int8_t *sU, int8_t *eV, mf3_t HU, wave_sk_t sk, prng_t PRNG);
 
 //void sign_wave(int8_t* e, int8_t *s, wave_sk_t sk, prng_t PRNG);
 
 void sign(f3_vector *signature, f3_vector *message_hash, uint8_t *salt,
-		const uint8_t *message, const size_t mlen, wave_sk_t *sk);
+		const uint8_t *message, const size_t mlen, const wave_sk_t sk);
 
 #endif /* SRC_WAVE_SIGN_H_ */

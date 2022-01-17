@@ -1,3 +1,10 @@
+/*
+ * keygen.h
+ *
+ *  Created on: Jan 29, 2021
+ *      Author: vader
+ */
+
 #ifndef KEYGEN_H_
 #define KEYGEN_H_
 
@@ -13,7 +20,10 @@
 
 #include "params.h"
 #include "definitions.h"
+#include "enum.h"
 
+
+void phiUV(int8_t *e, int8_t *eU, int8_t *eV, wave_sk_t sk);
 
 int keygen(wave_sk_t *sk, wave_pk_t *pk);
 

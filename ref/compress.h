@@ -1,3 +1,10 @@
+/*
+ * encode.h
+ *
+ *  Created on: Sep 30, 2021
+ *      Author: djarin
+ */
+
 #ifndef COMPRESS_H_
 #define COMPRESS_H_
 

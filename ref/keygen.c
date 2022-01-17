@@ -2,16 +2,6 @@
 #include <stdio.h>
 #include "keygen.h"
 
-/**
- * Function:  gen_coeffUV
- * --------------------
- *  Generation of coefficients a, b,c,d,x.
- *  a and c cannot contains 0.
- *
- *  PRNG: Pseudorandom generator (trits)
- * 	coeff: structure that will contains the trits
- *
- */
 void gen_coeffUV(prng_t *PRNG, coeff_t *coeff) {
 	int i;
 
@@ -27,20 +17,6 @@ void gen_coeffUV(prng_t *PRNG, coeff_t *coeff) {
 	}
 
 }
-
-/**
- * Function:  full_parity_check_matrix
- * --------------------
- * cComputation of the parity check matrix.
- *
- *  HU: Matrix in the U space (N2-KU x N2)
- *  HV: Matrix in V space (N2-KV x N2)
- *  coeff: coefficients pseudorandom generated.
- *
- *
- * return:
- * Matrix H size N-K x N
- */
 
 mf3* full_parity_check_matrix(mf3 *HU, mf3 *HV, coeff_t *coeff) {
 	int i, j;
@@ -72,21 +48,14 @@ mf3* full_parity_check_matrix(mf3 *HU, mf3 *HV, coeff_t *coeff) {
 int keygen(wave_sk_t *sk, wave_pk_t *pk) {
 
 	uint8_t key_seed = 2;
-	prng_t *PRNG;
 	randombytes(&key_seed, 1);
-	PRNG = prng_init(key_seed);
+	prng_t *PRNG = prng_init(key_seed);
 	randperm(sk->perm, N);
 
 	sk->HU = mf3_rand(N2 - KU, N2, PRNG);
-	prng_clear(PRNG);
 
-	randombytes(&key_seed, 1);
-	PRNG = prng_init(key_seed);
 	sk->HV = mf3_rand(N2 - KV, N2, PRNG);
-	prng_clear(PRNG);
 
-	randombytes(&key_seed, 1);
-	PRNG = prng_init(key_seed);
 	gen_coeffUV(PRNG, &sk->coeff);
 
 	mf3 *H = full_parity_check_matrix(sk->HU, sk->HV, &sk->coeff);
@@ -115,26 +84,13 @@ int keygen(wave_sk_t *sk, wave_pk_t *pk) {
 		}
 	}
 
-	mf3 *r_t = mf3_transpose(R);
-	mf3 *m_t = mf3_new(r_t->n_rows, r_t->n_cols);
-	for (int a = 0; a < (K - 1) / 2; a++) {
-		f3_vector_add(&r_t->row[2 * a], &r_t->row[(2 * a) + 1],
-				&m_t->row[2 * a]);
-		f3_vector_sub(&r_t->row[2 * a], &r_t->row[2 * a + 1],
-				&m_t->row[2 * a + 1]);
+	*pk = R;
 
-	}
-	f3_vector_neg_vector(&r_t->row[K - 1], &m_t->row[K - 1]);
-
-	*pk = m_t;
-
-	mf3_free(R);
-	mf3_free(r_t);
 	mf3_free(H);
 	mf3_free(Hsec);
 	prng_clear(PRNG);
 
-	return 1;
+	return SUCCESS;
 }
 
 void wave_sk_clear(wave_sk_t *sk) {

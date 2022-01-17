@@ -1,3 +1,10 @@
+/*
+ * encode.c
+ *
+ *  Created on: Sep 30, 2021
+ *      Author: djarin
+ */
+
 #include "compress.h"
 
 /*size_t code_len[] = { 2, 2, 3, 3, 4, 4, 4, 5, 5 };
@@ -859,39 +866,32 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 	while (index != -1) {
 		decode_one_triple(input, input_len, &index, &delta, &buffer, last, &s);
 		switch (s) {
-
 		case 0:
 			/*a_h.append(1)
 			 a_h.append(1)
 			 a_h.append(1)
-			 a_l.append(1)
-			 a_l.append(1)
-			 a_l.append(1)
-			 */
+			 a_l.append(0)
+			 a_l.append(0)
+			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 
 			break;
 		case 1:
-		/*a_h.append(1)
-		 a_h.append(1)
-		 a_h.append(0)
-
-		 a_l.append(1)
-		 a_l.append(1)
-		 a_l.append(1)*/
+			/*a_h.append(1)
+			 a_h.append(1)
+			 a_h.append(0)
+			 --
+			 a_l.append(0)
+			 a_l.append(0)
+			 a_l.append(1)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
@@ -902,16 +902,14 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			 a_h.append(0)
 			 a_h.append(1)
 
+			 a_l.append(0)
 			 a_l.append(1)
-			 a_l.append(1)
-			 a_l.append(1)*/
+			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 
 			break;
@@ -920,31 +918,31 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(1)
 			 a_h.append(1)
+			 --
 			 a_l.append(1)
-			 a_l.append(1)
-			 a_l.append(1)*/
+			 a_l.append(0)
+			 a_l.append(0)*/
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 
 			break;
 
 		case 4:
-			/*    a_h.append(1)
+			/*a_h.append(1)
 			 a_h.append(0)
 			 a_h.append(0)
-			 a_l.append(1)
+			 --
+			 a_l.append(0)
 			 a_l.append(1)
 			 a_l.append(1)*/
 
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
+
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
@@ -957,12 +955,11 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			 a_h.append(1)
 			 a_h.append(0)
 			 a_l.append(1)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(1)*/
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
@@ -973,15 +970,15 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(1)
+
 			 a_l.append(1)
 			 a_l.append(1)
-			 a_l.append(1)*/
+			 a_l.append(0)*/
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 
 			break;
@@ -989,9 +986,11 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
+			 --
 			 a_l.append(1)
 			 a_l.append(1)
 			 a_l.append(1)*/
+
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
@@ -1004,16 +1003,13 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(1)
 			 a_h.append(1)
 			 a_h.append(0)
-			 a_l.append(1)
-			 a_l.append(1)
+			 a_l.append(0)
+			 a_l.append(0)
 			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
-
 			idx++;
 			break;
 
@@ -1021,42 +1017,38 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(1)
 			 a_h.append(0)
 			 a_h.append(1)
-			 a_l.append(1)
 			 a_l.append(0)
-			 a_l.append(1)*/
+			 a_l.append(0)
+			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
-
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			break;
 		case 10:
 			/*a_h.append(0)
 			 a_h.append(1)
 			 a_h.append(1)
+			 --
 			 a_l.append(0)
-			 a_l.append(1)
-			 a_l.append(1)*/
+			 a_l.append(0)
+			 a_l.append(0)*/
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			break;
 		case 11:
 			/*a_h.append(1)
 			 a_h.append(0)
 			 a_h.append(0)
-			 a_l.append(1)
+			 --
+			 a_l.append(0)
 			 a_l.append(1)
 			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
@@ -1066,11 +1058,10 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(1)
 			 a_h.append(0)
 			 a_h.append(0)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(0)
 			 a_l.append(1)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			idx++;
 			setvalue_r0(out, idx);
@@ -1080,12 +1071,12 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(1)
 			 a_h.append(0)
+			 --
 			 a_l.append(0)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(1)*/
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
@@ -1095,12 +1086,11 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			 a_h.append(1)
 			 a_h.append(0)
 			 a_l.append(1)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(0)*/
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			idx++;
 			break;
@@ -1108,35 +1098,35 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(1)
+			 --
 			 a_l.append(1)
 			 a_l.append(0)
-			 a_l.append(1)*/
+			 a_l.append(0)*/
 			setvalue_r0(out, idx);
 			idx++;
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			break;
 		case 16:
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(1)
+			 --
 			 a_l.append(0)
 			 a_l.append(1)
-			 a_l.append(1)*/
-
+			 a_l.append(0)*/
 			idx++;
 			setvalue_r0(out, idx);
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			break;
 		case 17:
-			/*            a_h.append(0)
+			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
+			 --
 			 a_l.append(1)
 			 a_l.append(1)
 			 a_l.append(0)*/
@@ -1150,6 +1140,7 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
+			 --
 			 a_l.append(1)
 			 a_l.append(0)
 			 a_l.append(1)*/
@@ -1163,6 +1154,7 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
+			 --
 			 a_l.append(0)
 			 a_l.append(1)
 			 a_l.append(1)*/
@@ -1176,25 +1168,23 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(1)
 			 a_h.append(0)
 			 a_h.append(0)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(0)
 			 a_l.append(0)*/
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			idx++;
 			idx++;
 			break;
 		case 21:
-			/*    a_h.append(0)
+			/*a_h.append(0)
 			 a_h.append(1)
 			 a_h.append(0)
 			 a_l.append(0)
-			 a_l.append(1)
+			 a_l.append(0)
 			 a_l.append(0)*/
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			idx++;
 			break;
@@ -1202,13 +1192,13 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(1)
+			 --
 			 a_l.append(0)
 			 a_l.append(0)
-			 a_l.append(1)*/
+			 a_l.append(0)*/
 			idx++;
 			idx++;
 			setvalue_r1(out, idx);
-			setvalue_r0(out, idx);
 			idx++;
 			break;
 		case 23:
@@ -1224,7 +1214,7 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			idx++;
 			break;
 		case 24:
-			/*    a_h.append(0)
+			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
 			 a_l.append(0)
@@ -1236,7 +1226,7 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			idx++;
 			break;
 		case 25:
-			/*    a_h.append(0)
+			/*a_h.append(0)
 			 a_h.append(0)
 			 a_h.append(0)
 			 a_l.append(0)
@@ -1248,6 +1238,12 @@ void decode_sig_triple(const unsigned char *input, const size_t input_len,
 			idx++;
 			break;
 		case 26:
+			/*a_h.append(0)
+			 a_h.append(0)
+			 a_h.append(0)
+			 a_l.append(0)
+			 a_l.append(0)
+			 a_l.append(0)*/
 			idx++;
 			idx++;
 			idx++;

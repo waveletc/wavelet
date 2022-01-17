@@ -1,3 +1,9 @@
+/*
+ * params.h
+ *
+ *  Created on: Jun 21, 2021
+ *      Author: Gustavo Banegas
+ */
 
 #ifndef PARAMS_H_
 #define PARAMS_H_
