@@ -16,7 +16,7 @@ void gen_coeffUV(prng_t *PRNG, coeff_t *coeff) {
 	int i;
 
 	for (i = 0; i < N2; i++) {
-		coeff->a[i] = ((1 - (2 * rnd_bit(PRNG)) + 3) % 3);
+		coeff->a[i] = 1;
 		coeff->c[i] = ((1 - (2 * rnd_bit(PRNG)) + 3) % 3);
 
 		coeff->b[i] = rnd_trit(PRNG);
@@ -59,9 +59,7 @@ mf3* full_parity_check_matrix(mf3 *HU, mf3 *HV, coeff_t *coeff) {
 
 			mf3_setcoeff(Hsec, i + N2 - KU, j,
 					f3_neg(f3_mul(mf3_coeff(HV, i, j), coeff->c[j])));
-
-			mf3_setcoeff(Hsec, i + N2 - KU, j + N2,
-					f3_mul(mf3_coeff(HV, i, j), coeff->a[j]));
+			mf3_setcoeff(Hsec, i + N2 - KU, j + N2,mf3_coeff(HV, i, j));
 
 		}
 	}
@@ -73,19 +71,21 @@ int keygen(wave_sk_t *sk, wave_pk_t *pk) {
 
 	uint8_t key_seed = 2;
 	prng_t *PRNG;
-	randombytes(&key_seed, 1);
+	//randombytes(&key_seed, 1);
 	PRNG = prng_init(key_seed);
-	randperm(sk->perm, N);
+	//randperm(sk->perm, N);
 
+	for(size_t i =  0;i < N; i++)
+		sk->perm[i] = i;
 	sk->HU = mf3_rand(N2 - KU, N2, PRNG);
 	prng_clear(PRNG);
 
-	randombytes(&key_seed, 1);
+	//randombytes(&key_seed, 1);
 	PRNG = prng_init(key_seed);
 	sk->HV = mf3_rand(N2 - KV, N2, PRNG);
 	prng_clear(PRNG);
 
-	randombytes(&key_seed, 1);
+	//randombytes(&key_seed, 1);
 	PRNG = prng_init(key_seed);
 	gen_coeffUV(PRNG, &sk->coeff);
 
@@ -146,4 +146,3 @@ void wave_sk_clear(wave_sk_t *sk) {
 void wave_pk_clear(wave_pk_t pk) {
 	mf3_free(pk);
 }
-
